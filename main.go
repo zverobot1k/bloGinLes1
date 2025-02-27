@@ -27,15 +27,6 @@ type Member struct {
 	JoinDate  string `json:"join_date"`
 }
 
-type Borrowing struct {
-	BorrowingID int    `json:"borrowing_id"`
-	MemberID    int    `json:"member_id"`
-	BookID      int    `json:"book_id"`
-	BorrowDate  string `json:"borrow_date"`
-	ReturnDate  string `json:"return_date"`
-	Status      string `json:"status"`
-}
-
 type Reservation struct {
 	ReservationID   int    `json:"reservation_id"`
 	MemberID        int    `json:"member_id"`
