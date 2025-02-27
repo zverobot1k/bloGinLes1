@@ -7,14 +7,51 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Book struct {
+	BookID    int    `json:"book_id"`
+	Title     string `json:"title"`
+	Author    string `json:"author"`
+	Publisher string `json:"publisher"`
+	Year      int    `json:"year"`
+	Category  string `json:"category"`
+	Available bool   `json:"available"`
+}
+
+type Member struct {
+	MemberID  int    `json:"member_id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Phone     string `json:"phone"`
+	Email     string `json:"email"`
+	Address   string `json:"address"`
+	JoinDate  string `json:"join_date"`
+}
+
+type Borrowing struct {
+	BorrowingID int    `json:"borrowing_id"`
+	MemberID    int    `json:"member_id"`
+	BookID      int    `json:"book_id"`
+	BorrowDate  string `json:"borrow_date"`
+	ReturnDate  string `json:"return_date"`
+	Status      string `json:"status"`
+}
+
+type Reservation struct {
+	ReservationID   int    `json:"reservation_id"`
+	MemberID        int    `json:"member_id"`
+	BookID          int    `json:"book_id"`
+	ReservationDate string `json:"reservation_date"`
+	Status          string `json:"status"`
+}
+
 var books []Book
 var members []Member
-var borrowings []Borrowing
 var reservations []Reservation
 
 func main() {
-	books = append(books, Book{BookID: 1, Title: "Go Programming", Author: "John Doe", Publisher: "Tech Books", Year: 2022, Category: "Programming", Available: true})
-	members = append(members, Member{MemberID: 1, FirstName: "Alice", LastName: "Smith", Phone: "1234567890", Email: "alice@example.com", Address: "123 Main St", JoinDate: "2022-01-01"})
+	books = append(books, Book{BookID: 0, Title: "Go Programming", Author: "Maksim Blokhin", Publisher: "Tech", Year: 2022, Category: "Programming", Available: true})
+	members = append(members, Member{MemberID: 0, FirstName: "Maksim", LastName: "Blokhin", Phone: "1234567890", Email: "maksim@example.com", Address: "123st Mira", JoinDate: "2022-01-01"})
+	reservations = append(reservations, Reservation{ReservationID: 0, MemberID: 0, BookID: 0, ReservationDate: "11.08.2024", Status: "Active"})
 
 	r := gin.Default()
 
@@ -29,12 +66,6 @@ func main() {
 	r.POST("/members", createMember)
 	r.PUT("/members/:id", updateMember) //!!!
 	r.DELETE("/members/:id", deleteMember)
-
-	r.GET("/borrowings", getBorrowings)
-	r.GET("/borrowings/:id", getBorrowingByID)
-	r.POST("/borrowings", createBorrowing)
-	r.PUT("/borrowings/:id", updateBorrowing) //!!!
-	r.DELETE("/borrowings/:id", deleteBorrowing)
 
 	r.GET("/reservations", getReservations)
 	r.GET("/reservations/:id", getReservationByID)
@@ -151,60 +182,6 @@ func deleteMember(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusNotFound, gin.H{"message": "Member not found"})
-}
-
-func getBorrowings(c *gin.Context) {
-	c.JSON(http.StatusOK, borrowings)
-}
-
-func getBorrowingByID(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	for _, borrowing := range borrowings {
-		if borrowing.BorrowingID == id {
-			c.JSON(http.StatusOK, borrowing)
-			return
-		}
-	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "Borrowing not found"})
-}
-
-func createBorrowing(c *gin.Context) {
-	var newBorrowing Borrowing
-	if err := c.ShouldBindJSON(&newBorrowing); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	borrowings = append(borrowings, newBorrowing)
-	c.JSON(http.StatusCreated, newBorrowing)
-}
-
-func updateBorrowing(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	var updatedBorrowing Borrowing
-	if err := c.ShouldBindJSON(&updatedBorrowing); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	for i, borrowing := range borrowings {
-		if borrowing.BorrowingID == id {
-			borrowings[i] = updatedBorrowing
-			c.JSON(http.StatusOK, updatedBorrowing)
-			return
-		}
-	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "Borrowing not found"})
-}
-
-func deleteBorrowing(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	for i, borrowing := range borrowings {
-		if borrowing.BorrowingID == id {
-			borrowings = append(borrowings[:i], borrowings[i+1:]...)
-			c.JSON(http.StatusOK, gin.H{"message": "Borrowing deleted"})
-			return
-		}
-	}
-	c.JSON(http.StatusNotFound, gin.H{"message": "Borrowing not found"})
 }
 
 func getReservations(c *gin.Context) {
